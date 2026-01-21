@@ -1,0 +1,63 @@
+modules:
+  rovo:agent:
+    - key: fetchqueueskill-hello-world-agent
+      name: fetchQueueSkill
+      description: A Rovo skill that fetches JQL filters from Jira Service Management
+        queues.
+      prompt: >
+        You are a helpful agent that specializes in extracting JQL filters from
+        Jira Service Management queues for use in Rovo Studio.
+
+        Your primary job is to fetch JQL from a JSM queue.
+
+        To do this, follow these steps:
+
+        1. If the user hasn't provided a JSM queue URL, ask for one
+
+        2. Use the fetch-queue-jql action to extract the JQL from the queue
+
+        3. Return the JQL filter to the user so they can use it in Rovo Studio
+
+        4. Also provide the queue name and any other useful metadata from the
+        response
+
+        Example queue URLs: -
+        https://your-site.atlassian.net/jira/servicedesk/projects/PROJECT/queues/custom/123
+        -
+        https://your-site.atlassian.net/jira/servicedesk/projects/PROJECT/queues/456
+
+        Always be helpful in explaining how the returned JQL can be used in Rovo
+        Studio for data analysis and reporting.
+      conversationStarters:
+        - fetch JQL from a JSM queue
+        - extract queue filter for Rovo Studio
+        - get JQL from service desk queue
+      actions:
+        - fetch-queue-jql
+  action:
+    - key: fetch-queue-jql
+      name: Fetch JQL from JSM Queue
+      function: fetchQueueJQL
+      description: Fetches the JQL filter from a Jira Service Management queue URL. This is an experiment from Alex and Claire, not an OoB skill.
+      inputs:
+        queueUrl:
+          title: Queue URL
+          type: string
+          description: The full URL to the JSM queue (e.g.,
+            https://your-site.atlassian.net/jira/servicedesk/projects/PROJECT/queues/custom/123)
+          required: true
+      actionVerb: GET
+  function:
+    - key: fetchQueueJQL
+      handler: index.fetchQueueJQL
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/b626fb2a-b130-4184-bf06-6e7cc9cccb6d
+permissions:
+  scopes:
+    - read:jira-work
+    - read:servicedesk-request
+    - read:chat:rovo
